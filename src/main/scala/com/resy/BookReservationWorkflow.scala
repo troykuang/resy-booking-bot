@@ -96,7 +96,7 @@ object BookReservationWorkflow {
 
     results match {
       case Success(reservationTimes) =>
-        findReservationTime(reservationTimes, times)
+        findReservationTime(reservationTimes, times, dining_type )
       case Failure(_) if endTime - DateTime.now.getMillis > 0 =>
         retryFindReservation(endTime)
       case _ =>
@@ -107,21 +107,30 @@ object BookReservationWorkflow {
   @tailrec
   private[this] def findReservationTime(
     reservationTimes: IndexedSeq[JsValue],
-    timePref: Seq[String]
+    timePref: Seq[String],
+    typePref: String
   ): String = {
     val reservation =
-      Try(
-        (reservationTimes.filter(x => (x \ "date" \ "start").get.toString == s""""${timePref.head}"""")(
-          0
-        ) \ "config" \ "token").get.toString
-      )
+      if (typePref.isEmpty) {
+        Try(
+          (reservationTimes.filter(x => (x \ "date" \ "start").get.toString == s""""${timePref.head}"""")(
+            0
+          ) \ "config" \ "token").get.toString
+        )
+      } else {
+        Try(
+          (reservationTimes.filter(x => (x \ "date" \ "start").get.toString == s""""${timePref.head}"""" && (x \ "config" \ "type").get.toString.equalsIgnoreCase(s""""${typePref}""""))(
+            0
+          ) \ "config" \ "token").get.toString
+        )
+      }
 
     reservation match {
       case Success(configId) =>
         println(s"${DateTime.now} Config Id: $configId")
         configId.substring(1, configId.length()-1)
       case Failure(_) if timePref.size > 0 =>
-        findReservationTime(reservationTimes, timePref.tail)
+        findReservationTime(reservationTimes, timePref.tail, typePref)
       case _ =>
         throw new Exception(JsError("Could not find a reservation for the given time(s)"))
     }

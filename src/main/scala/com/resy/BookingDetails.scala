@@ -9,8 +9,9 @@ object BookingDetails {
   val venueId: String = AuthKeys.venueId
   // YYYY-MM-DD of reservation
   val day = "2022-02-09"
-  //indoor or outdoor etc. Should match the type exactly on the resy venue
-  val dining_type= "Indoor Dining"
+
+  //indoor or outdoor etc. Should match the type exactly on the resy venue (case doesn't matter). Leave blank if you don't care or don't now
+  val dining_type= "Indoor Dining Room"
 
   // Seq of YYYY-MM-DD HH:MM:SS times of reservations in military time format
   val times = Seq(

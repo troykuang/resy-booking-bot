@@ -27,7 +27,7 @@ object ResyApiWrapper {
       ),
     FindReservation ->
       ApiDetails(
-        url = "api.resy.com/3/find",
+        url = "api.resy.com/4/find",
         testSuccessResponse =
           """{"results": [{"configs": [{"table_config_id": 123456, "type": "Dining Room", "time_slot": "17:15:00", "badge": null, "service_type_id": 2, "colors": {"background": "2E6D81", "font": "FFFFFF"}, "template": null, "id": 123457, "day": "2018-03-20", "tags": {"inside_outside": ["inside"], "time_period": ["late"], "service_type": ["dinner"]}, "on_market": 1}, {"table_config_id": 123458, "type": "Dining Room", "time_slot": "19:15:00", "badge": null, "service_type_id": 2, "colors": {"background": "2E6D81", "font": "FFFFFF"}, "template": null, "id": 123459, "day": "2018-03-20", "tags": {"inside_outside": ["inside"], "time_period": ["late"], "service_type": ["dinner"]}, "on_market": 1}], "venue": {"rating": 4.9, "id": {"foursquare": "123456", "resy": 800, "google": "123456"}, "name": "Restaurant", "templates": {}, "metadata": {"description": "Description", "keywords": ["book", "dining", "reservations", "restaurant", "new york city", "123456", "times square", "steakhouse", "resy", "5.0 star"]}, "images": ["https://image.resy.com/1.jpg/jpg/640x360", "https://image.resy.com/2.jpg/jpg/640x360", "https://image.resy.com/3.jpg/jpg/640x360"], "config": {"enable_resypay": 0, "allow_bypass_payment_method": 1, "allow_multiple_resys": 0, "hospitality_included": 0, "enable_invite": 1}, "url_slug": "restaurant", "service_types": {"2": {"name": "dinner", "available": true, "user": {"notify": {"set": false, "matched": false, "preferences": null}}}}, "price_range": 3, "travel_time": {"distance": 0, "driving": 0, "walking": 0}, "rater": {"image": "https://s3.amazonaws.com/resy.png", "score": 5.0, "name": "Resy", "scale": 5}, "location": {"address_2": null, "postal_code": "12345", "address_1": "1 Wall St", "locality": "New York City", "neighborhood": "Times Square", "region": "NY", "time_zone": "EST5EDT", "longitude": -0.0, "latitude": 0.0}, "contact": {"phone_number": "+17181234567"}, "num_ratings": 5000, "type": "Steakhouse", "top": true, "notify": {"matched": 0}}}], "filter": [{"options": [["early", null, "early"], ["late", null, "late"]], "id": "time_period", "unavailable": false}], "query": {"day": "2018-03-20", "party_size": 2}}""",
         testFailureRespnse =
@@ -96,7 +96,12 @@ object ResyApiWrapper {
   private[this] def stringifyQueryParams(queryParams: Map[String, String]): String = {
     queryParams.foldLeft("") { (combined, tuple) =>
       {
-        combined + s"""${tuple._1}=${URLEncoder.encode(tuple._2, "UTF-8")}&"""
+        //i don't wanna encode this
+        if (tuple._1 == "config_id") {
+          combined + s"""${tuple._1}=${tuple._2}&"""
+        } else {
+          combined + s"""${tuple._1}=${URLEncoder.encode(tuple._2, "UTF-8")}&"""
+        }
       }
     }
   }

@@ -10,6 +10,8 @@ import scala.annotation.tailrec
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import scala.util.{Failure, Success, Try}
+import scala.language.postfixOps
+import collection.IndexedSeq
 
 object BookReservationWorkflow {
   implicit val testing = false
@@ -87,7 +89,7 @@ object BookReservationWorkflow {
     //ConfigId - Searching for this pattern - "time_slot": "17:15:00", "badge": null, "service_type_id": 2, "colors": {"background": "2E6D81", "font": "FFFFFF"}, "template": null, "id": 123457
 
     val results = Try(
-      (Json.parse(findResResp) \ "results" \ 0 \ "configs").get
+      (Json.parse(findResResp) \ "results" \ "venues" \ 0 \ "slots").get
         .as[JsArray]
         .value
     )
@@ -109,15 +111,15 @@ object BookReservationWorkflow {
   ): String = {
     val reservation =
       Try(
-        (reservationTimes.filter(x => (x \ "time_slot").get.toString == s""""${timePref.head}"""")(
+        (reservationTimes.filter(x => (x \ "date" \ "start").get.toString == s""""${timePref.head}"""")(
           0
-        ) \ "id").get.toString
+        ) \ "config" \ "token").get.toString
       )
 
     reservation match {
       case Success(configId) =>
         println(s"${DateTime.now} Config Id: $configId")
-        configId
+        configId.substring(1, configId.length()-1)
       case Failure(_) if timePref.size > 0 =>
         findReservationTime(reservationTimes, timePref.tail)
       case _ =>

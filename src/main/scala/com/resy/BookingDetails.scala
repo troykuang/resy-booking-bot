@@ -2,25 +2,21 @@ package com.resy
 
 object BookingDetails {
   // Your user profile Auth Token
-  val auth_token = ""
+  val auth_token: String = AuthKeys.auth_token
   // Your user profile API key
-  val api_key = ""
+  val api_key: String = AuthKeys.api_key
   // RestaurantId where you want to make the reservation
-  val venueId = ""
+  val venueId: String = AuthKeys.venueId
   // YYYY-MM-DD of reservation
-  val day = "2018-01-01"
+  val day = "2022-02-09"
+  //indoor or outdoor etc. Should match the type exactly on the resy venue
+  val dining_type= "Indoor Dining"
 
-  // Seq of HH:MM:SS times of reservations in military time format
+  // Seq of YYYY-MM-DD HH:MM:SS times of reservations in military time format
   val times = Seq(
-    "18:00:00",
-    "18:15:00",
-    "18:30:00",
-    "18:45:00",
-    "19:00:00",
-    "19:15:00",
-    "19:30:00",
-    "19:45:00",
-    "20:00:00"
+    "2022-02-09 12:00:00",
+    "2022-02-09 14:30:00",
+    "2022-02-09 12:00:00"
   )
   // Size of party
   val partySize = "2"

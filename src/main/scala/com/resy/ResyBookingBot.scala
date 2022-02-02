@@ -2,6 +2,7 @@ package com.resy
 
 import akka.actor.ActorSystem
 import com.resy.BookReservationWorkflow._
+import com.resy.BookingDetails.hourOfDayToStartBooking
 import org.joda.time.DateTime
 import play.api.libs.json._
 
@@ -15,26 +16,35 @@ object ResyBookingBot{
   def main(args: Array[String]): Unit = {
     println("Starting Resy Booking Bot")
 
-    val system              = ActorSystem("System")
-    val startOfTomorrow     = DateTime.now.withTimeAtStartOfDay.plusDays(1).getMillis
-    val millisUntilTomorrow = startOfTomorrow - DateTime.now.getMillis - 1000
-    val hoursRemaining      = millisUntilTomorrow / 1000 / 60 / 60
-    val minutesRemaining    = millisUntilTomorrow / 1000 / 60 - hoursRemaining * 60
+    val system = ActorSystem("System")
+    val rightNow = DateTime.now.hourOfDay().get
+    val hourToStartChecking = hourOfDayToStartBooking
+
+    val startCheckTime =
+      if (rightNow < hourToStartChecking) {
+        DateTime.now.withTimeAtStartOfDay().plusHours(hourToStartChecking).getMillis
+      } else {
+        DateTime.now.withTimeAtStartOfDay().plusDays(1).plusHours(hourToStartChecking).getMillis
+      }
+
+    val millisUntilStart = startCheckTime - DateTime.now.getMillis - 1000
+    val hoursRemaining = millisUntilStart / 1000 / 60 / 60
+    val minutesRemaining = millisUntilStart / 1000 / 60 - hoursRemaining * 60
     val secondsRemaining =
-      millisUntilTomorrow / 1000 - hoursRemaining * 60 * 60 - minutesRemaining * 60
+      millisUntilStart / 1000 - hoursRemaining * 60 * 60 - minutesRemaining * 60
 
     println(s"Current time: ${DateTime.now}")
     println(
       s"Sleeping for $hoursRemaining hours, $minutesRemaining minutes and $secondsRemaining seconds"
     )
-    system.scheduler.scheduleOnce(millisUntilTomorrow millis)(bookReservationWorkflow)
+    system.scheduler.scheduleOnce(millisUntilStart millis)(bookReservationWorkflow)
   }
 
   def bookReservationWorkflow = {
     println(s"Attempting to snipe reservation at ${DateTime.now}")
 
     //Try to get configId of the time slot for 10 seconds
-    val findResResp = retryFindReservation(DateTime.now.plusSeconds(10).getMillis)
+    val findResResp = retryFindReservation(DateTime.now.plusSeconds(15).getMillis)
 
     //Try to book the reservation
     for {

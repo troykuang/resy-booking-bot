@@ -72,6 +72,9 @@ object BookReservationWorkflow {
       "source_id"             -> "resy.com-venue-details"
     )
 
+    // Dry run, comment out the following line for a dry run
+    // System.exit(0)
+
     sendPostRequest(ResyApiMapKeys.BookReservation, bookResQueryParams)
   }
 
@@ -110,6 +113,7 @@ object BookReservationWorkflow {
     timePref: Seq[String],
     typePref: String
   ): String = {
+    println(s"Trying to find a table at ${timePref.head}")
     val reservation =
       if (typePref.isEmpty) {
         Try(

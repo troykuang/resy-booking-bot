@@ -28,6 +28,8 @@ object ResyBookingBot{
       }
 
     val millisUntilStart = startCheckTime - DateTime.now.getMillis - 1000
+    // Dry run, comment out the following line for a quick dry run
+    // val millisUntilStart = 1000
     val hoursRemaining = millisUntilStart / 1000 / 60 / 60
     val minutesRemaining = millisUntilStart / 1000 / 60 - hoursRemaining * 60
     val secondsRemaining =

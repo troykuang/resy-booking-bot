@@ -26,3 +26,10 @@ night so 10 seconds is to allow for some buffer.  Once times are retrieved, it w
 slot given your priority list of reservation times.  If a time can be booked, it will make an attempt to snipe it.
 Otherwise it will report that it was unable to acquire a reservation.  In the event it was unable to get any
 reservations for 10 seconds, the bot will automatically shutdown.
+
+## Scala
+```
+sbt
+compile
+run
+```
